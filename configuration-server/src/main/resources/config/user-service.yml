@@ -1,0 +1,7 @@
+# user-service.yml
+server:
+  port: 8090
+
+custom:
+  property:
+    description: Hello! It's user-service prod

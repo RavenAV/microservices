@@ -1,0 +1,7 @@
+# company-service.yml
+server:
+  port: 8089
+
+custom:
+  property:
+    description: Hello! It's company-service prod
