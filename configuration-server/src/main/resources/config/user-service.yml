@@ -5,3 +5,7 @@ server:
 custom:
   property:
     description: Hello! It's user-service prod
+
+spring:
+  datasource:
+    url:  jdbc:postgresql://host.docker.internal:5433/microservices?currentSchema=user-schema
