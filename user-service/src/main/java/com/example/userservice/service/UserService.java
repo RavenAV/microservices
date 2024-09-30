@@ -28,7 +28,6 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Company does not exist");
         }*/
 
-
         var user = new User();
         user.setName(createUserDto.getName());
         user.setLogin(createUserDto.getLogin());
