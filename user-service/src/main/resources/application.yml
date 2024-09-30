@@ -6,5 +6,5 @@ spring:
       url: ${CONFIG_SERVER_URL}
   datasource:
     flyway:
-#      enabled: true
+      enabled: true
       locations: classpath:db/migration

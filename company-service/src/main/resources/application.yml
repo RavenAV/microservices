@@ -4,9 +4,6 @@ spring:
   cloud:
     config:
       url: ${CONFIG_SERVER_URL}
-#  jpa:
-#    hibernate:
-#      ddl-auto: none
   datasource:
     flyway:
       enabled: true

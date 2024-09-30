@@ -16,8 +16,8 @@ spring:
 #      config:
 #        server:
 #          bootstrap: true
-  datasource:
-    username: user
-    password: password
-    url: jdbc:postgresql://localhost:5433/microservices
-    driver-class-name: org.postgresql.Driver
+#  datasource:
+#    username: user
+#    password: password
+#    url: jdbc:postgresql://localhost:5433/microservices
+#    driver-class-name: org.postgresql.Driver
