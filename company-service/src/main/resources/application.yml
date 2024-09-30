@@ -1,7 +1,13 @@
 spring:
   application:
     name: company-service
-
   cloud:
     config:
       url: ${CONFIG_SERVER_URL}
+#  jpa:
+#    hibernate:
+#      ddl-auto: none
+  datasource:
+    flyway:
+      enabled: true
+      locations: classpath:db/migration

@@ -8,4 +8,7 @@ custom:
 
 spring:
   datasource:
-    url:  jdbc:postgresql://host.docker.internal:5433/microservices?currentSchema=company-schema
+    username: user
+    password: password
+    url: jdbc:postgresql://localhost:5433/microservices?currentSchema=company-schema
+    driver-class-name: org.postgresql.Driver
