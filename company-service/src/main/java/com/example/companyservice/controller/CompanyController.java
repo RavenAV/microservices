@@ -1,5 +1,6 @@
 package com.example.companyservice.controller;
 
+import com.example.companyservice.feignClientModel.CompanyShortInfoDto;
 import com.example.companyservice.model.CreateCompanyDto;
 import com.example.companyservice.model.ViewCompanyDto;
 import com.example.companyservice.service.CompanyService;
@@ -13,26 +14,34 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/company")
+@RequestMapping("/companies")
 public class CompanyController {
     private CompanyService companyService;
 
-    @GetMapping
+    @GetMapping("/getAllCompanies")
     public List<ViewCompanyDto> getAllCompanies() {
         return companyService.getAllCompanies();
     }
 
-    @PostMapping
+    @PostMapping("/createCompany")
     public ResponseEntity<Long> createCompany(@RequestBody CreateCompanyDto companyDto) {
         var companyId = companyService.createCompany(companyDto);
         return ResponseEntity.ok(companyId);
     }
 
-    @GetMapping("/{id}/exists")
-    public ResponseEntity<Void> companyExists(@PathVariable Long id) {
-        if (!companyService.checkCompanyExisting(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Company not found");
-        }
-        return ResponseEntity.ok().build();
+    @GetMapping("/exists/{id}")
+    public ResponseEntity<Boolean> companyExists(@PathVariable Long id) {
+        return ResponseEntity.ok(companyService.checkCompanyExisting(id));
+    }
+
+    @GetMapping("/name/{id}")
+    public ResponseEntity<String> getCompanyName(@PathVariable Long id) {
+        var name = companyService.getCompanyName(id);
+        return ResponseEntity.ok(name);
+    }
+
+    @GetMapping("/getAllCompaniesShortInfo")
+    public List<CompanyShortInfoDto> getAllCompaniesShortInfo() {
+        return companyService.getAllCompaniesShortInfo();
     }
 }

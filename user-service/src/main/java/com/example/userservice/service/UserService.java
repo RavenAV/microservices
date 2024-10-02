@@ -1,9 +1,12 @@
 package com.example.userservice.service;
 
 import com.example.userservice.domain.User;
+import com.example.userservice.feignClientModel.CompanyShortInfoDto;
+import com.example.userservice.feignClientModel.UserShortInfoDto;
 import com.example.userservice.model.CreateUserDto;
 import com.example.userservice.model.UpdateUserDto;
 import com.example.userservice.model.ViewUserDto;
+import com.example.userservice.repository.ICompanyServiceFeignClient;
 import com.example.userservice.repository.IUserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -15,16 +18,18 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
     private final IUserRepository userRepository;
+    private final ICompanyServiceFeignClient companyServiceFeignClient;
 
-    public UserService(IUserRepository userRepository) {
+    public UserService(IUserRepository userRepository, ICompanyServiceFeignClient companyServiceFeignClient) {
         this.userRepository = userRepository;
+        this.companyServiceFeignClient = companyServiceFeignClient;
     }
 
     // Создание пользователя (должна быть синхронная проверка из company-service, на существование компании. Если компании не существует –
     // кидать 404 ошибку с соответствующим сообщением)
     public Long createUser(CreateUserDto createUserDto) {
-        // check existing of company
-        /*if (!companyService.companyExists(.getCompanyId())) {
+        /*Boolean isExistCompany = companyServiceFeignClient.companyExists(createUserDto.getCompanyId());
+        if (!isExistCompany) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Company does not exist");
         }*/
 
@@ -34,7 +39,7 @@ public class UserService {
         user.setPassword(createUserDto.getPassword());
         user.setEmail(createUserDto.getEmail());
         user.setEnabled(true);
-        user.getCompanyId();
+        user.setCompanyId(createUserDto.getCompanyId());
 
         userRepository.save(user);
         return user.getId();
@@ -43,6 +48,8 @@ public class UserService {
     // Получение списка всех пользователей (информация о компании должна подтягиваться синхронное из company-service)
     public List<ViewUserDto> getAllUsers() {
         List<User> users = userRepository.findAll();
+        List<CompanyShortInfoDto> companies = companyServiceFeignClient.getAllCompaniesShortInfo();
+
         return users.stream().map(user -> {
             var userDto = new ViewUserDto();
             userDto.setId(user.getId());
@@ -52,7 +59,13 @@ public class UserService {
             userDto.setEnabled(user.getEnabled());
             userDto.setCompanyId(user.getCompanyId());
 
-            //userDto.setCompanyName(user.getCompanyName());
+            String companyName = companies.stream()
+                    .filter(c -> c.getId().equals(user.getCompanyId()))
+                    .findFirst()
+                    .map(c -> c.getName())
+                    .orElse("");
+            userDto.setCompanyName(companyName);
+
             return userDto;
         }).collect(Collectors.toList());
     }
@@ -69,9 +82,10 @@ public class UserService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found or inactive"));
 
         // check existing company
-        /*if (!companyService.companyExists(userDto.getCompanyName())) {
+        Boolean isExistCompany = companyServiceFeignClient.companyExists(updateUserDto.getCompanyId());
+        if (!isExistCompany) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Company does not exist");
-        }*/
+        }
 
         user.setName(updateUserDto.getName());
         user.setEmail(updateUserDto.getEmail());
@@ -83,5 +97,20 @@ public class UserService {
     // Проверка существования пользователя по идентификатору (если пользователь существует, но неактивен – тоже кидаем 404 ошибку)
     public boolean checkUserExisting(Long id) {
         return userRepository.findByIdAndEnabledTrue(id).isPresent();
+    }
+
+    public String getUserName(Long id) {
+        return userRepository.findNameById(id);
+    }
+
+    public List<UserShortInfoDto> getAllUsersShortInfo() {
+        List<User> users = userRepository.findAll();
+        return users.stream().map(user -> {
+            var userDto = new UserShortInfoDto();
+            userDto.setId(user.getId());
+            userDto.setName(user.getName());
+
+            return userDto;
+        }).collect(Collectors.toList());
     }
 }
