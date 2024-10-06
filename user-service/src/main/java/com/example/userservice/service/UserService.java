@@ -28,10 +28,12 @@ public class UserService {
     // Создание пользователя (должна быть синхронная проверка из company-service, на существование компании. Если компании не существует –
     // кидать 404 ошибку с соответствующим сообщением)
     public Long createUser(CreateUserDto createUserDto) {
-        /*Boolean isExistCompany = companyServiceFeignClient.companyExists(createUserDto.getCompanyId());
-        if (!isExistCompany) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Company does not exist");
-        }*/
+        if (createUserDto.getCompanyId() != null) {
+            Boolean isExistCompany = companyServiceFeignClient.companyExists(createUserDto.getCompanyId());
+            if (!isExistCompany) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Company does not exist");
+            }
+        }
 
         var user = new User();
         user.setName(createUserDto.getName());

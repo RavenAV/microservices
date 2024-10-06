@@ -9,7 +9,7 @@ import java.util.List;
 
 @FeignClient(
    name = "user-service",
-   path = "/api/users",
+   path = "/users",
    url = "http://localhost:8090"
 )
 public interface IUserServiceFeignClient {

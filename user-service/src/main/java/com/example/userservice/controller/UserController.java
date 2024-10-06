@@ -6,7 +6,6 @@ import com.example.userservice.model.UpdateUserDto;
 import com.example.userservice.model.ViewUserDto;
 import com.example.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -17,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
-    private UserService userService;
+    private final UserService userService;
 
     @GetMapping("/getAllUsers")
     public List<ViewUserDto> getAllUsers() {
@@ -62,5 +61,10 @@ public class UserController {
     @GetMapping("/getAllUsersShortInfo")
     public List<UserShortInfoDto> getAllUsersShortInfo() {
         return userService.getAllUsersShortInfo();
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<String> handleResponseStatusException(ResponseStatusException ex) {
+        return ResponseEntity.status(ex.getStatusCode()).body(ex.getMessage());
     }
 }

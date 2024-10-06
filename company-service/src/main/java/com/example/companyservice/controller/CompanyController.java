@@ -44,4 +44,9 @@ public class CompanyController {
     public List<CompanyShortInfoDto> getAllCompaniesShortInfo() {
         return companyService.getAllCompaniesShortInfo();
     }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<String> handleResponseStatusException(ResponseStatusException ex) {
+        return ResponseEntity.status(ex.getStatusCode()).body(ex.getMessage());
+    }
 }

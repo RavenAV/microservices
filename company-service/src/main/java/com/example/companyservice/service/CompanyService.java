@@ -55,15 +55,18 @@ public class CompanyService {
 
     // Создание компании
     public Long createCompany(CreateCompanyDto createCompanyDto) {
-        Boolean isExistCompany = userServiceFeignClient.userExists(createCompanyDto.getDirectorId());
-        if (!isExistCompany) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Director does not exist");
+        if (createCompanyDto.getDirectorId() != null) {
+            Boolean isExistCompany = userServiceFeignClient.userExists(createCompanyDto.getDirectorId());
+            if (!isExistCompany) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Director does not exist");
+            }
         }
 
         var company = new Company();
         company.setName(createCompanyDto.getName());
         company.setOgrn(createCompanyDto.getOgrn());
         company.setDescription(createCompanyDto.getDescription());
+        company.setDirectorId(createCompanyDto.getDirectorId());
 
         companyRepository.save(company);
         return company.getId();
