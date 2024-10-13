@@ -24,7 +24,7 @@ public class CompanyService {
         this.userServiceFeignClient = userServiceFeignClient;
     }
 
-    // Получение списка всех компаний ( с ФИО директора)
+    // Получение списка всех компаний (с ФИО директора)
     public List<ViewCompanyDto> getAllCompanies() {
         List<Company> companies = companyRepository.findAll();
         List<UserShortInfoDto> users = userServiceFeignClient.getAllUsersShortInfo();

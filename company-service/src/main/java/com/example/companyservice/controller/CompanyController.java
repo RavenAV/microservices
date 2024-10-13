@@ -5,7 +5,6 @@ import com.example.companyservice.model.CreateCompanyDto;
 import com.example.companyservice.model.ViewCompanyDto;
 import com.example.companyservice.service.CompanyService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -16,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/companies")
 public class CompanyController {
-    private CompanyService companyService;
+    private final CompanyService companyService;
 
     @GetMapping("/getAllCompanies")
     public List<ViewCompanyDto> getAllCompanies() {
