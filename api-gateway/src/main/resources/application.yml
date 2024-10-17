@@ -1,5 +1,6 @@
 server:
   port: 8082
+
 spring:
   application:
     name: api-gateway
@@ -9,6 +10,16 @@ spring:
         locator:
           enabled: true
           lower-case-service-id: true
+      routes:
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/user/**
+        - id: company-service
+          uri: lb://company-service
+          predicates:
+            - Path=/company/**
+
 eureka:
   client:
     service-url:
