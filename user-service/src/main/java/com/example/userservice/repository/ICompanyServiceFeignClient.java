@@ -10,7 +10,7 @@ import java.util.List;
 @FeignClient(
    name = "company-service",
    path = "/companies",
-   url = "http://localhost:8082"
+   url = "http://localhost:8082/company-service"
 )
 public interface ICompanyServiceFeignClient {
     @GetMapping("/exists/{id}")

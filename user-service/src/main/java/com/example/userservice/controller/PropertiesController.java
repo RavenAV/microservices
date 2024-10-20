@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/properties")
+@RequestMapping("/user")
 public class PropertiesController {
     private final ServiceDescriptionConfig descriptionConfig;
 
