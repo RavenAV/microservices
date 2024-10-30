@@ -18,6 +18,7 @@ public class Company {
     private String ogrn;
     private String description;
     private Long directorId;
+    private Boolean isDeleted;
 
     // Getters and Setters
     public Long getId() {
@@ -60,5 +61,13 @@ public class Company {
 
     public void setDirectorId(Long directorId) {
         this.directorId = directorId;
+    }
+
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
+    public Boolean getIsDeleted() {
+        return isDeleted;
     }
 }

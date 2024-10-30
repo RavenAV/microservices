@@ -8,6 +8,14 @@ spring:
     flyway:
       enabled: true
       locations: classpath:db/migration
+#  kafka:
+#    bootstrap-servers: localhost:9092  # Адрес Kafka сервера
+
+#kafka:
+#  listener:
+#    topic: company-deletion-topic  # Тема для получения сообщений об удалении компании
+#  template:
+#    default-topic: company-physical-deletion-topic # Тема для отправки сообщения обратно в Company Service после сброса company_id у пользователей
 
 eureka:
   client:

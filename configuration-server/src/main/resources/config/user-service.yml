@@ -12,3 +12,11 @@ spring:
     password: password
     url: jdbc:postgresql://localhost:5433/microservices?currentSchema=user-schema
     driver-class-name: org.postgresql.Driver
+
+  kafka:
+    consumer:
+      group-id: user-service-group  # Группа для потребления сообщений из Kafka
+    listener:
+      topic: company-deletion-topic  # Тема для получения сообщений об удалении компании
+    template:
+      default-topic: company-physical-deletion-topic # Тема для отправки сообщения обратно в Company Service после сброса company_id у пользователей

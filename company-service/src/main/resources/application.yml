@@ -8,6 +8,21 @@ spring:
     flyway:
       enabled: true
       locations: classpath:db/migration
+#  kafka:
+#    bootstrap-servers: localhost:9092  # Адрес Kafka сервера
+#    producer:
+#      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+#      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+#    consumer:
+#      group-id: company-service-group  # Группа для прослушивания сообщений
+#      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+#      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+#kafka:
+#  template:
+#    default-topic: company-deletion-topic # Тема для отправки сообщений о мягком удалении
+#  listener:
+#    topic: company-physical-deletion-topic  # Тема для физического удаления компаний
 
 eureka:
   client:

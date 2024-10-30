@@ -9,6 +9,7 @@ import com.example.userservice.model.ViewUserDto;
 import com.example.userservice.repository.ICompanyServiceFeignClient;
 import com.example.userservice.repository.IUserRepository;
 import org.springframework.http.HttpStatus;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -19,10 +20,12 @@ import java.util.stream.Collectors;
 public class UserService {
     private final IUserRepository userRepository;
     private final ICompanyServiceFeignClient companyServiceFeignClient;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
-    public UserService(IUserRepository userRepository, ICompanyServiceFeignClient companyServiceFeignClient) {
+    public UserService(IUserRepository userRepository, ICompanyServiceFeignClient companyServiceFeignClient, KafkaTemplate<String, String> kafkaTemplate) {
         this.userRepository = userRepository;
         this.companyServiceFeignClient = companyServiceFeignClient;
+        this.kafkaTemplate = kafkaTemplate;
     }
 
     // Создание пользователя (должна быть синхронная проверка из company-service, на существование компании. Если компании не существует –
@@ -114,5 +117,16 @@ public class UserService {
 
             return userDto;
         }).collect(Collectors.toList());
+    }
+
+    public void resetCompanyForUsers(Long companyId) {
+        List<User> users = userRepository.findByCompanyId(companyId);
+        for (User user : users) {
+            user.setCompanyId(null);  // Сбрасываем company_id для каждого пользователя
+            userRepository.save(user);
+        }
+
+        // Отправляем сообщение в Kafka для физического удаления компании
+        kafkaTemplate.send("company-physical-deletion-topic", companyId.toString());
     }
 }

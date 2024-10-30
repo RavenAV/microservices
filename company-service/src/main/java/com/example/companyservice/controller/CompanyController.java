@@ -1,15 +1,18 @@
 package com.example.companyservice.controller;
 
+import com.example.companyservice.domain.Company;
 import com.example.companyservice.feignClientModel.CompanyShortInfoDto;
 import com.example.companyservice.model.CreateCompanyDto;
 import com.example.companyservice.model.ViewCompanyDto;
 import com.example.companyservice.service.CompanyService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -42,6 +45,15 @@ public class CompanyController {
     @GetMapping("/getAllCompaniesShortInfo")
     public List<CompanyShortInfoDto> getAllCompaniesShortInfo() {
         return companyService.getAllCompaniesShortInfo();
+    }
+
+    @DeleteMapping("/deleteCompany/{id}")
+    public ResponseEntity<String> deleteCompany(@PathVariable Long id) {
+        boolean deleted = companyService.softDeleteCompany(id);
+        if (!deleted) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Company not found");
+        }
+        return ResponseEntity.ok("Company marked as deleted");
     }
 
     @ExceptionHandler(ResponseStatusException.class)

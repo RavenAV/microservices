@@ -8,10 +8,12 @@ import com.example.companyservice.model.ViewCompanyDto;
 import com.example.companyservice.repository.ICompanyRepository;
 import com.example.companyservice.repository.IUserServiceFeignClient;
 import org.springframework.http.HttpStatus;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,9 +21,12 @@ public class CompanyService {
     private final ICompanyRepository companyRepository;
     private final IUserServiceFeignClient userServiceFeignClient;
 
-    public CompanyService(ICompanyRepository companyRepository, IUserServiceFeignClient userServiceFeignClient) {
+    private final KafkaTemplate<String, String> kafkaTemplate;
+
+    public CompanyService(ICompanyRepository companyRepository, IUserServiceFeignClient userServiceFeignClient, KafkaTemplate<String, String> kafkaTemplate) {
         this.companyRepository = companyRepository;
         this.userServiceFeignClient = userServiceFeignClient;
+        this.kafkaTemplate = kafkaTemplate;
     }
 
     // Получение списка всех компаний (с ФИО директора)
@@ -29,7 +34,7 @@ public class CompanyService {
         List<Company> companies = companyRepository.findAll();
         List<UserShortInfoDto> users = userServiceFeignClient.getAllUsersShortInfo();
 
-        return companies.stream().map(company -> {
+        return companies.stream().filter(company -> !company.getIsDeleted()).map(company -> {
             var companyDto = new ViewCompanyDto();
             companyDto.setId(company.getId());
             companyDto.setName(company.getName());
@@ -86,5 +91,24 @@ public class CompanyService {
 
             return companyDto;
         }).collect(Collectors.toList());
+    }
+
+    // создаём эндпоинт для мягкого удаления компании и отправляем сообщение в Kafka
+    public boolean softDeleteCompany(Long id) {
+        Optional<Company> companyOpt = companyRepository.findById(id);
+        if (companyOpt.isPresent()) {
+            Company company = companyOpt.get();
+            company.setIsDeleted(true);  // Помечаем компанию как удаленную
+            companyRepository.save(company);  // Сохраняем изменение в базе данных
+
+            // Отправляем сообщение в Kafka о soft-delete компании
+            kafkaTemplate.send("company-deletion-topic", id.toString());
+            return true;
+        }
+        return false;
+    }
+
+    public void physicalDeleteCompany(Long id) {
+        companyRepository.deleteById(id);
     }
 }
