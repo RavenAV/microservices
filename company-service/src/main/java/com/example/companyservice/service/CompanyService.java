@@ -3,12 +3,12 @@ package com.example.companyservice.service;
 import com.example.companyservice.domain.Company;
 import com.example.companyservice.feignClientModel.CompanyShortInfoDto;
 import com.example.companyservice.feignClientModel.UserShortInfoDto;
+import com.example.companyservice.kafka.KafkaProducerService;
 import com.example.companyservice.model.CreateCompanyDto;
 import com.example.companyservice.model.ViewCompanyDto;
 import com.example.companyservice.repository.ICompanyRepository;
 import com.example.companyservice.repository.IUserServiceFeignClient;
 import org.springframework.http.HttpStatus;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -20,13 +20,12 @@ import java.util.stream.Collectors;
 public class CompanyService {
     private final ICompanyRepository companyRepository;
     private final IUserServiceFeignClient userServiceFeignClient;
+    private final KafkaProducerService kafkaProducerService;
 
-    private final KafkaTemplate<String, String> kafkaTemplate;
-
-    public CompanyService(ICompanyRepository companyRepository, IUserServiceFeignClient userServiceFeignClient, KafkaTemplate<String, String> kafkaTemplate) {
+    public CompanyService(ICompanyRepository companyRepository, IUserServiceFeignClient userServiceFeignClient, KafkaProducerService kafkaProducerService) {
         this.companyRepository = companyRepository;
         this.userServiceFeignClient = userServiceFeignClient;
-        this.kafkaTemplate = kafkaTemplate;
+        this.kafkaProducerService = kafkaProducerService;
     }
 
     // Получение списка всех компаний (с ФИО директора)
@@ -99,16 +98,10 @@ public class CompanyService {
         if (companyOpt.isPresent()) {
             Company company = companyOpt.get();
             company.setIsDeleted(true);  // Помечаем компанию как удаленную
-            companyRepository.save(company);  // Сохраняем изменение в базе данных
-
-            // Отправляем сообщение в Kafka о soft-delete компании
-            kafkaTemplate.send("company-deletion-topic", id.toString());
+            companyRepository.saveAndFlush(company);  // Сохраняем изменение в базе данных
+            kafkaProducerService.send("delete-company", id.toString(), id.toString());
             return true;
         }
         return false;
-    }
-
-    public void physicalDeleteCompany(Long id) {
-        companyRepository.deleteById(id);
     }
 }

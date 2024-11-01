@@ -1,6 +1,5 @@
 package com.example.companyservice.controller;
 
-import com.example.companyservice.domain.Company;
 import com.example.companyservice.feignClientModel.CompanyShortInfoDto;
 import com.example.companyservice.model.CreateCompanyDto;
 import com.example.companyservice.model.ViewCompanyDto;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -53,7 +51,7 @@ public class CompanyController {
         if (!deleted) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Company not found");
         }
-        return ResponseEntity.ok("Company marked as deleted");
+        return ResponseEntity.ok("Company was deleted");
     }
 
     @ExceptionHandler(ResponseStatusException.class)

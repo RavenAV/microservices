@@ -118,15 +118,4 @@ public class UserService {
             return userDto;
         }).collect(Collectors.toList());
     }
-
-    public void resetCompanyForUsers(Long companyId) {
-        List<User> users = userRepository.findByCompanyId(companyId);
-        for (User user : users) {
-            user.setCompanyId(null);  // Сбрасываем company_id для каждого пользователя
-            userRepository.save(user);
-        }
-
-        // Отправляем сообщение в Kafka для физического удаления компании
-        kafkaTemplate.send("company-physical-deletion-topic", companyId.toString());
-    }
 }
